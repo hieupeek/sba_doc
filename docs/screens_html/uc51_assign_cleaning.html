@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wireframe - UC-51 Assign Room Cleaning Task</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #000000;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .wireframe-container {
+      width: 580px;
+      border: 1.5px solid #222222;
+      border-radius: 4px;
+      padding: 16px;
+      background: #ffffff;
+    }
+    .header-bar {
+      border-bottom: 1.5px solid #222222;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .screen-title {
+      font-size: 17px;
+      font-weight: bold;
+    }
+    .marker {
+      color: #d32f2f;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .filter-section {
+      border: 1px solid #444444;
+      border-radius: 3px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      background: #fafafa;
+    }
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+    select, input[type="text"], textarea {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      padding: 5px 8px;
+      border: 1px solid #333333;
+      border-radius: 3px;
+      background: #ffffff;
+      color: #000000;
+    }
+    .table-container {
+      margin-bottom: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    th, td {
+      border: 1px solid #444444;
+      padding: 7px 8px;
+      text-align: left;
+    }
+    th {
+      background: #eeeeee;
+      font-weight: bold;
+    }
+    .assignment-panel {
+      border: 1.5px solid #333333;
+      border-radius: 4px;
+      padding: 12px 14px;
+      margin-top: 10px;
+      background: #ffffff;
+    }
+    .panel-title {
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      padding-bottom: 4px;
+      border-bottom: 1px dashed #666666;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .form-control-full {
+      width: 100%;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 55px;
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 9px;
+      background: #2b2b2b;
+      color: #ffffff;
+      border: 1px solid #000000;
+      border-radius: 3px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      margin-top: 6px;
+    }
+    .rule-note {
+      font-size: 11px;
+      color: #444444;
+      margin-top: 8px;
+      line-height: 1.3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wireframe-container">
+    <!-- Header -->
+    <div class="header-bar">
+      <div class="screen-title">
+        <span class="marker">(1)</span> Assign Room Cleaning Task
+      </div>
+      <div style="font-size: 12px; border: 1px solid #666; padding: 2px 6px; border-radius: 3px;">
+        Role: Manager
+      </div>
+    </div>
+
+    <!-- Status Filter Section -->
+    <div class="filter-section">
+      <div class="filter-row">
+        <span><span class="marker">(2)</span> <strong>Filter Status:</strong></span>
+        <select>
+          <option selected>Dirty (Turnover Required)</option>
+          <option>All Statuses</option>
+          <option>Clean / Inspected</option>
+          <option>Out of Order</option>
+        </select>
+        <span><strong>Floor:</strong></span>
+        <select>
+          <option>All Floors</option>
+          <option>Floor 2</option>
+          <option>Floor 3</option>
+          <option>Floor 4</option>
+        </select>
+        <button style="padding: 4px 10px; border: 1px solid #333; background: #eee; cursor: pointer; border-radius: 3px; font-size: 12px;">Filter</button>
+      </div>
+    </div>
+
+    <!-- Room Table -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 70px; text-align: center;"><span class="marker">(3)</span> Select</th>
+            <th style="width: 75px;">Room</th>
+            <th>Room Type</th>
+            <th style="width: 70px;">Status</th>
+            <th>Checkout Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align: center;"><input type="checkbox" checked></td>
+            <td><strong>302</strong></td>
+            <td>Deluxe King</td>
+            <td>Dirty</td>
+            <td>12:15 PM</td>
+          </tr>
+          <tr>
+            <td style="text-align: center;"><input type="checkbox"></td>
+            <td><strong>305</strong></td>
+            <td>Deluxe Twin</td>
+            <td>Dirty</td>
+            <td>11:45 AM</td>
+          </tr>
+          <tr>
+            <td style="text-align: center;"><input type="checkbox"></td>
+            <td><strong>410</strong></td>
+            <td>Executive Suite</td>
+            <td>Dirty</td>
+            <td>12:00 PM</td>
+          </tr>
+          <tr>
+            <td style="text-align: center;"><input type="checkbox"></td>
+            <td><strong>204</strong></td>
+            <td>Standard Single</td>
+            <td>Dirty</td>
+            <td>10:30 AM</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Assignment Form Panel -->
+    <div class="assignment-panel">
+      <div class="panel-title">
+        <span class="marker">(4)</span> Assignment Details Panel
+      </div>
+
+      <div class="form-group">
+        <label><span class="marker">(5)</span> Assign Housekeeping Staff (*):</label>
+        <select class="form-control-full">
+          <option selected>Le Thi Mai (Active - Shift 1, 2 rooms completed)</option>
+          <option>Tran Van Binh (Active - Shift 1, 1 room completed)</option>
+          <option>Nguyen Thi Cuc (Active - Shift 1, Available)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label><span class="marker">(6)</span> Cleaning Urgency / Priority (*):</label>
+        <select class="form-control-full">
+          <option>Normal (Standard Turnover)</option>
+          <option selected>High (Upcoming Check-in 14:00)</option>
+          <option>Urgent (Early Arrival Guest)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label><span class="marker">(7)</span> Cleaning Instructions / Special Notes:</label>
+        <textarea class="form-control-full" placeholder="e.g., Replace all bedsheets, provide 2 extra bath towels, inspect minibar restock..."></textarea>
+      </div>
+
+      <button class="btn-submit">
+        <span class="marker" style="color: #ff9999;">(8)</span> Confirm Assignment
+      </button>
+
+      <div class="rule-note">
+        * Business Rule BR-43: Only rooms in Dirty status can be assigned. The assignee must be an active Housekeeping Staff member.
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
