@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Đăng nhập Hệ thống &bull; Grand Horizon Hotels &amp; Resorts</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #F4F1EA;
+      background-image: 
+        radial-gradient(at 15% 15%, rgba(218, 119, 86, 0.08) 0px, transparent 50%),
+        radial-gradient(at 85% 85%, rgba(180, 83, 9, 0.06) 0px, transparent 50%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: #1F1E1D;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Claude Design Callout Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      background: #CC5A36;
+      color: #FAF9F5;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+      margin-right: 8px;
+      box-shadow: 0 2px 5px rgba(204, 90, 54, 0.35);
+      flex-shrink: 0;
+    }
+
+    .login-wrapper {
+      width: 980px;
+      background: #FAF9F5;
+      border: 1px solid #E5E0D5;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 
+        0 1px 2px rgba(31, 30, 29, 0.04),
+        0 12px 32px -4px rgba(31, 30, 29, 0.08),
+        0 24px 64px -12px rgba(31, 30, 29, 0.06);
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+    }
+
+    /* Left Editorial Brand Panel */
+    .brand-panel {
+      background: #ECE7DD;
+      border-right: 1px solid #E2DCD0;
+      padding: 60px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .brand-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-crest {
+      width: 38px;
+      height: 38px;
+      background: #1F1E1D;
+      color: #FAF9F5;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Newsreader', serif;
+      font-size: 22px;
+      font-weight: 600;
+      font-style: italic;
+    }
+
+    .brand-name {
+      font-family: 'Newsreader', serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: #1F1E1D;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-story {
+      margin: 44px 0;
+    }
+
+    .editorial-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #CC5A36;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .brand-title {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 34px;
+      line-height: 1.25;
+      font-weight: 500;
+      color: #1F1E1D;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-title em {
+      font-style: italic;
+      color: #9A3412;
+    }
+
+    .brand-desc {
+      font-size: 14px;
+      line-height: 1.65;
+      color: #5C5852;
+      max-width: 420px;
+    }
+
+    .brand-footer {
+      font-size: 12px;
+      color: #7A756D;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Right Form Side */
+    .form-panel {
+      padding: 60px 48px;
+      background: #FAF9F5;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .form-header {
+      margin-bottom: 32px;
+    }
+
+    .form-header h2 {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 26px;
+      font-weight: 600;
+      color: #1F1E1D;
+      letter-spacing: -0.4px;
+      margin-bottom: 6px;
+    }
+
+    .form-header p {
+      font-size: 13px;
+      color: #78736B;
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #383530;
+      margin-bottom: 8px;
+      letter-spacing: -0.1px;
+    }
+
+    .input-box {
+      width: 100%;
+      height: 44px;
+      padding: 0 14px;
+      background: #FFFFFF;
+      border: 1.5px solid #DCD6CA;
+      border-radius: 9px;
+      font-size: 14px;
+      color: #1F1E1D;
+      outline: none;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .input-box:focus {
+      border-color: #CC5A36;
+      box-shadow: 0 0 0 3px rgba(204, 90, 54, 0.15);
+    }
+
+    .options-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .checkbox-wrap {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      color: #5C5852;
+      cursor: pointer;
+    }
+
+    .checkbox-wrap input {
+      width: 16px;
+      height: 16px;
+      margin-right: 6px;
+      accent-color: #CC5A36;
+    }
+
+    .forgot-wrap {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .forgot-link {
+      color: #CC5A36;
+      text-decoration: none;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    .btn-submit {
+      width: 100%;
+      height: 46px;
+      background: #1F1E1D;
+      color: #FAF9F5;
+      border: none;
+      border-radius: 9px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(31, 30, 29, 0.15);
+    }
+
+    .btn-submit:hover {
+      background: #33302C;
+    }
+
+    .btn-submit .badge {
+      background: #FAF9F5;
+      color: #CC5A36;
+      margin-right: 10px;
+    }
+
+    .security-dossier {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 11.5px;
+      color: #8C867D;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .lock-icon {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #16A34A;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-wrapper">
+    <!-- Left Editorial Panel -->
+    <div class="brand-panel">
+      <div class="brand-top">
+        <div class="brand-crest">H</div>
+        <div class="brand-name">Grand Horizon</div>
+      </div>
+
+      <div class="brand-story">
+        <span class="editorial-label">Hệ thống Quản lý Khách sạn</span>
+        <h1 class="brand-title">Kiến tạo trải nghiệm <em>nghỉ dưỡng trọn vẹn</em> qua hệ thống chuẩn mực.</h1>
+        <p class="brand-desc">
+          Cổng vận hành tập trung kết nối Bộ phận Lễ tân tiền sảnh, Quản trị Buồng phòng, Dịch vụ Tiện ích và Báo cáo Doanh thu tài chính.
+        </p>
+      </div>
+
+      <div class="brand-footer">
+        <span>Khách sạn Grand Horizon &bull; Cổng thông tin nội bộ</span>
+      </div>
+    </div>
+
+    <!-- Right Form Panel -->
+    <div class="form-panel">
+      <div class="form-header">
+        <h2>Đăng nhập Hệ thống</h2>
+        <p>Vui lòng nhập tài khoản nhân viên được cấp để truy cập phân hệ</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          <span class="badge">1</span>
+          Email / Tên đăng nhập
+        </label>
+        <input type="text" class="input-box" value="letan@horizonhotel.com" placeholder="name@horizonhotel.com">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          <span class="badge">2</span>
+          Mật khẩu truy cập
+        </label>
+        <input type="password" class="input-box" value="••••••••••••" placeholder="Nhập mật khẩu an toàn">
+      </div>
+
+      <div class="options-row">
+        <label class="checkbox-wrap">
+          <span class="badge">3</span>
+          <input type="checkbox" checked>
+          <span>Ghi nhớ đăng nhập</span>
+        </label>
+
+        <div class="forgot-wrap">
+          <span class="badge">4</span>
+          <a href="#" class="forgot-link">Quên mật khẩu?</a>
+        </div>
+      </div>
+
+      <button class="btn-submit">
+        <span class="badge">5</span>
+        <span>Đăng Nhập Phân Hệ</span>
+      </button>
+
+      <div class="security-dossier">
+        <span class="lock-icon"></span>
+        <span>Hệ thống bảo mật nội bộ &bull; Kết nối mã hóa SSL</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

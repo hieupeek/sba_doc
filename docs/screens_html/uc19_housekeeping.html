@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Bảng Điều Phối Buồng Phòng &bull; Grand Horizon</title>
+  <link rel="stylesheet" href="claude_base.css">
+  <style>
+    body {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Claude Literary Sidebar */
+    .sidebar {
+      width: 250px;
+      background: #ECEAE1;
+      border-right: 1px solid var(--border-soft);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .sidebar-header {
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .brand-crest {
+      width: 34px;
+      height: 34px;
+      background: var(--fg);
+      color: var(--surface);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif);
+      font-size: 19px;
+      font-weight: 600;
+      font-style: italic;
+    }
+    .brand-title {
+      font-family: var(--font-serif);
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--fg);
+      letter-spacing: -0.2px;
+    }
+    .nav-list { list-style: none; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+    .nav-item {
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .nav-item:hover { background: var(--surface-warm); color: var(--fg); }
+    .nav-item.active {
+      background: var(--surface);
+      color: var(--fg);
+      font-weight: 600;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 18px 24px;
+      border-top: 1px solid var(--border-soft);
+      font-size: 11.5px;
+      color: var(--meta);
+      line-height: 1.5;
+    }
+
+    /* Main Area */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .topbar {
+      height: 60px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      flex-shrink: 0;
+    }
+    .topbar-meta { font-size: 12.5px; color: var(--muted); }
+    .topbar-meta b { color: var(--fg); font-weight: 600; }
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12.5px;
+    }
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--surface-warm);
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 11px;
+      border: 1px solid var(--border-strong);
+    }
+
+    .content-area { padding: 28px 32px; }
+
+    /* Page Header */
+    .page-header { margin-bottom: 22px; }
+    .page-title h1 {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--fg);
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+    .page-title p { font-size: 13px; color: var(--muted); }
+
+    /* Stats Row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 16px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .stat-label { font-size: 11.5px; color: var(--meta); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-family: var(--font-serif); font-size: 26px; font-weight: 600; color: var(--fg); margin-top: 4px; }
+
+    /* Filter Card */
+    .filter-card {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+    }
+    .filter-group { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .filter-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+    }
+    .form-control {
+      height: 38px;
+      padding: 0 12px;
+      background: var(--surface-warm);
+      border: 1.5px solid var(--border-strong);
+      border-radius: 7px;
+      font-size: 13px;
+      color: var(--fg);
+      outline: none;
+      font-family: inherit;
+    }
+    .form-control:focus { border-color: var(--accent); }
+    .btn-filter {
+      height: 38px;
+      padding: 0 18px;
+      background: var(--fg);
+      color: var(--surface);
+      border: none;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    .btn-filter .badge { background: var(--surface); color: var(--fg); }
+
+    /* Table Card */
+    .table-card {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .table-top {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .table-top h3 {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th {
+      padding: 11px 18px;
+      background: #FAF8F2;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--meta);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-soft);
+      font-size: 13px;
+      color: var(--fg);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #FAF9F5; }
+
+    .room-num { font-weight: 700; font-family: var(--font-mono); color: var(--fg); }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .pill-dirty { background: #FEE2E2; color: #991B1B; }
+    .pill-clean { background: #DCFCE7; color: #166534; }
+    .pill-inspected { background: #FEF3C7; color: #854D0E; }
+
+    .occ-badge {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .occ-occupied { color: var(--accent); font-weight: 600; }
+
+    .btn-action {
+      padding: 6px 12px;
+      background: var(--surface-warm);
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--fg);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn-action:hover { background: var(--border-soft); }
+    .btn-action .badge { margin-right: 6px; width: 18px; height: 18px; font-size: 10px; }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-crest">H</div>
+      <div class="brand-title">Grand Horizon</div>
+    </div>
+    <ul class="nav-list">
+      <li class="nav-item">Tổng quan</li>
+      <li class="nav-item">Lễ tân &amp; Nhận phòng</li>
+      <li class="nav-item active">Quản lý Buồng phòng</li>
+      <li class="nav-item">Bảo trì Cơ sở vật chất</li>
+      <li class="nav-item">Dịch vụ &amp; Tiện ích</li>
+      <li class="nav-item">Thu ngân &amp; Hóa đơn</li>
+      <li class="nav-item">Báo cáo Doanh thu</li>
+    </ul>
+    <div class="sidebar-footer">
+      Grand Horizon Hotels &amp; Resorts<br>
+      Cổng quản trị buồng phòng
+    </div>
+  </aside>
+
+  <!-- Main View -->
+  <main class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-meta">
+        Khách sạn Grand Horizon &bull; <b>Quản lý Buồng phòng</b>
+      </div>
+      <div class="user-pill">
+        <div class="avatar">HK</div>
+        <span>Nhân viên: <b>Nguyễn Thị Mai</b> (Tổ Buồng phòng)</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="page-header">
+        <div class="page-title">
+          <h1>Bảng Điều Phối Buồng Phòng</h1>
+          <p>Theo dõi tình trạng vệ sinh và điều phối nhân sự dọn buồng phòng thời gian thực</p>
+        </div>
+      </div>
+
+      <!-- KPI Summary -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Tổng số phòng</div>
+          <div class="stat-value">48</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Cần dọn dẹp</div>
+          <div class="stat-value" style="color: var(--danger);">12</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Đã dọn xong</div>
+          <div class="stat-value" style="color: var(--success);">18</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Đã kiểm định</div>
+          <div class="stat-value" style="color: #854D0E;">18</div>
+        </div>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="filter-card">
+        <div class="filter-group">
+          <label class="filter-label">
+            <span class="badge">1</span>
+            Tìm kiếm số phòng
+          </label>
+          <input type="text" class="form-control" placeholder="Ví dụ: 101, 202, 301...">
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">
+            <span class="badge">2</span>
+            Tình trạng buồng phòng
+          </label>
+          <select class="form-control">
+            <option>Tất cả tình trạng (Cần dọn, Đã dọn, Đã kiểm định)</option>
+            <option>CẦN DỌN (Chưa dọn dẹp)</option>
+            <option>ĐÃ DỌN (Chờ giám sát kiểm tra)</option>
+            <option>ĐÃ KIỂM ĐỊNH (Sẵn sàng đón khách)</option>
+          </select>
+        </div>
+
+        <button class="btn-filter">
+          <span class="badge">3</span>
+          Lọc danh sách
+        </button>
+      </div>
+
+      <!-- Room Table -->
+      <div class="table-card">
+        <div class="table-top">
+          <h3>
+            <span class="badge">4</span>
+            Danh Sách Phòng &amp; Trạng Thái Vệ Sinh
+          </h3>
+          <span style="font-size: 12px; color: var(--meta);">Hiển thị các phòng đang hoạt động tại Tầng 1 &amp; Tầng 2</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Số phòng</th>
+              <th>Hạng phòng</th>
+              <th>Tầng</th>
+              <th>Giá tiêu chuẩn</th>
+              <th>Tình trạng buồng</th>
+              <th>Trạng thái lưu trú</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="room-num">101</span></td>
+              <td>Phòng Tiêu Chuẩn Đơn</td>
+              <td>Tầng 1</td>
+              <td>800.000 VNĐ</td>
+              <td><span class="status-pill pill-dirty">CẦN DỌN</span></td>
+              <td><span class="occ-badge">TRỐNG</span></td>
+              <td>
+                <button class="btn-action">
+                  <span class="badge">5</span>
+                  Xác nhận dọn xong
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="room-num">102</span></td>
+              <td>Phòng Tiêu Chuẩn Đơn</td>
+              <td>Tầng 1</td>
+              <td>800.000 VNĐ</td>
+              <td><span class="status-pill pill-clean">ĐÃ DỌN</span></td>
+              <td><span class="occ-badge">TRỐNG</span></td>
+              <td><button class="btn-action">Kiểm định phòng</button></td>
+            </tr>
+            <tr>
+              <td><span class="room-num">201</span></td>
+              <td>Phòng Cao Cấp Đôi King</td>
+              <td>Tầng 2</td>
+              <td>1.500.000 VNĐ</td>
+              <td><span class="status-pill pill-dirty">CẦN DỌN</span></td>
+              <td><span class="occ-badge occ-occupied">ĐANG CÓ KHÁCH</span></td>
+              <td><button class="btn-action">Báo dọn phòng</button></td>
+            </tr>
+            <tr>
+              <td><span class="room-num">202</span></td>
+              <td>Phòng Cao Cấp Đôi King</td>
+              <td>Tầng 2</td>
+              <td>1.500.000 VNĐ</td>
+              <td><span class="status-pill pill-inspected">ĐÃ KIỂM ĐỊNH</span></td>
+              <td><span class="occ-badge">SẴN SÀNG</span></td>
+              <td><button class="btn-action">Xem lịch sử</button></td>
+            </tr>
+            <tr>
+              <td><span class="room-num">301</span></td>
+              <td>Phòng Tổng Thống VIP</td>
+              <td>Tầng 3</td>
+              <td>2.800.000 VNĐ</td>
+              <td><span class="status-pill pill-inspected">ĐÃ KIỂM ĐỊNH</span></td>
+              <td><span class="occ-badge occ-occupied">ĐANG CÓ KHÁCH</span></td>
+              <td><button class="btn-action">Xem lịch sử</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

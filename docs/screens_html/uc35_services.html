@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Danh Mục Dịch Vụ Khách Sạn &bull; Grand Horizon</title>
+  <link rel="stylesheet" href="claude_base.css">
+  <style>
+    body {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #ECEAE1;
+      border-right: 1px solid var(--border-soft);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .sidebar-header {
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .brand-crest {
+      width: 34px;
+      height: 34px;
+      background: var(--fg);
+      color: var(--surface);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif);
+      font-size: 19px;
+      font-weight: 600;
+      font-style: italic;
+    }
+    .brand-title {
+      font-family: var(--font-serif);
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--fg);
+      letter-spacing: -0.2px;
+    }
+    .nav-list { list-style: none; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+    .nav-item {
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .nav-item.active {
+      background: var(--surface);
+      color: var(--fg);
+      font-weight: 600;
+      border: 1px solid var(--border-soft);
+    }
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 18px 24px;
+      border-top: 1px solid var(--border-soft);
+      font-size: 11.5px;
+      color: var(--meta);
+    }
+
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .topbar {
+      height: 60px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      flex-shrink: 0;
+    }
+    .topbar-meta { font-size: 12.5px; color: var(--muted); }
+    .topbar-meta b { color: var(--fg); font-weight: 600; }
+    .user-pill { display: flex; align-items: center; gap: 10px; font-size: 12.5px; }
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #FCE7F3;
+      color: #BE185D;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 11px;
+      border: 1px solid var(--border-strong);
+    }
+
+    .content-area { padding: 32px; }
+
+    .page-header { margin-bottom: 22px; }
+    .page-title {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .page-desc { font-size: 13px; color: var(--muted); }
+
+    .control-card {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+    }
+    .ctrl-group { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .ctrl-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+    }
+    .form-control {
+      height: 38px;
+      padding: 0 12px;
+      background: var(--surface-warm);
+      border: 1.5px solid var(--border-strong);
+      border-radius: 7px;
+      font-size: 13px;
+      color: var(--fg);
+      outline: none;
+      font-family: inherit;
+    }
+    .btn-filter {
+      height: 38px;
+      padding: 0 18px;
+      background: var(--fg);
+      color: var(--surface);
+      border: none;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    .btn-filter .badge { background: var(--surface); color: var(--fg); }
+
+    .table-card {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th {
+      padding: 12px 18px;
+      background: #FAF8F2;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--meta);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    th .badge { width: 18px; height: 18px; font-size: 10px; margin-right: 4px; }
+    td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-soft);
+      font-size: 13px;
+      color: var(--fg);
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #FAF9F5; }
+
+    .dept-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .dept-laundry { background: #E0F2FE; color: #0369A1; }
+    .dept-spa { background: #FCE7F3; color: #BE185D; }
+    .dept-fb { background: #FEF3C7; color: #B45309; }
+
+    .stepper {
+      display: inline-flex;
+      align-items: center;
+      border: 1.5px solid var(--border-strong);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #FFFFFF;
+    }
+    .stepper input {
+      width: 44px;
+      height: 32px;
+      border: none;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .amt-mono {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    .btn-add {
+      padding: 7px 14px;
+      background: var(--success);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(21, 128, 61, 0.25);
+    }
+    .btn-add .badge { background: #FFFFFF; color: var(--success); }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-crest">H</div>
+      <div class="brand-title">Grand Horizon</div>
+    </div>
+    <ul class="nav-list">
+      <li class="nav-item">Tổng quan</li>
+      <li class="nav-item">Lễ tân &amp; Nhận phòng</li>
+      <li class="nav-item">Quản lý Buồng phòng</li>
+      <li class="nav-item">Bảo trì Cơ sở vật chất</li>
+      <li class="nav-item active">Dịch vụ &amp; Tiện ích</li>
+      <li class="nav-item">Thu ngân &amp; Hóa đơn</li>
+      <li class="nav-item">Báo cáo Doanh thu</li>
+    </ul>
+    <div class="sidebar-footer">
+      Grand Horizon Hotels &amp; Resorts<br>
+      Bộ phận Dịch vụ &amp; Tiện ích
+    </div>
+  </aside>
+
+  <main class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-meta">
+        Khách sạn Grand Horizon &bull; <b>Dịch vụ &amp; Tiện ích</b>
+      </div>
+      <div class="user-pill">
+        <div class="avatar">SV</div>
+        <span>Thu ngân: <b>Vũ Mỹ Linh</b> (Quầy Dịch vụ)</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <!-- (1) Title -->
+      <div class="page-header">
+        <h1 class="page-title">
+          <span class="badge">1</span>
+          Danh Mục Dịch Vụ Khách Sạn &amp; Ghi Nợ Hóa Đơn Phòng
+        </h1>
+        <p class="page-desc">Cung cấp dịch vụ tiện ích và tự động ghi nợ vào tài khoản hóa đơn của phòng đang lưu trú</p>
+      </div>
+
+      <!-- Control Card -->
+      <div class="control-card">
+        <div class="ctrl-group">
+          <label class="ctrl-label">
+            <span class="badge">2</span>
+            Chọn phòng &amp; Khách hàng đang lưu trú*
+          </label>
+          <select class="form-control">
+            <option selected>Phòng 202 &bull; Khách: Phạm Hoàng Long [Đang lưu trú]</option>
+            <option>Phòng 301 &bull; Khách VIP: Trần Minh [Đang lưu trú]</option>
+            <option>Phòng 105 &bull; Khách: Vương Quốc Bảo [Đang lưu trú]</option>
+          </select>
+        </div>
+
+        <div class="ctrl-group">
+          <label class="ctrl-label">
+            <span class="badge">3</span>
+            Phân loại dịch vụ
+          </label>
+          <select class="form-control">
+            <option selected>Tất cả danh mục dịch vụ</option>
+            <option>Giặt là</option>
+            <option>Spa &amp; Chăm sóc sức khỏe</option>
+            <option>Ẩm thực &amp; Đồ uống (F&amp;B)</option>
+          </select>
+        </div>
+
+        <button class="btn-filter">
+          <span class="badge">4</span>
+          Lọc danh mục
+        </button>
+      </div>
+
+      <!-- Table Card -->
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <span class="badge">5</span>
+                Tên dịch vụ
+              </th>
+              <th>
+                <span class="badge">6</span>
+                Phân loại
+              </th>
+              <th>
+                <span class="badge">7</span>
+                Đơn giá
+              </th>
+              <th>
+                <span class="badge">8</span>
+                Đơn vị
+              </th>
+              <th>
+                <span class="badge">9</span>
+                Số lượng
+              </th>
+              <th>
+                <span class="badge">10</span>
+                Thành tiền
+              </th>
+              <th>
+                <span class="badge">11</span>
+                Thao tác
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b style="font-family: var(--font-serif); font-size: 14.5px;">Giặt ủi quần áo cao cấp (Lấy nhanh trong ngày)</b></td>
+              <td><span class="dept-badge dept-laundry">Giặt là</span></td>
+              <td><span class="amt-mono">50.000 VNĐ</span></td>
+              <td>Kg</td>
+              <td>
+                <div class="stepper">
+                  <input type="number" value="2" min="1" max="50">
+                </div>
+              </td>
+              <td><span class="amt-mono" style="font-weight: 700;">100.000 VNĐ</span></td>
+              <td>
+                <button class="btn-add">
+                  <span class="badge">12</span>
+                  Thêm vào hóa đơn
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td><b style="font-family: var(--font-serif); font-size: 14.5px;">Liệu trình Massage thư giãn toàn thân (60 phút)</b></td>
+              <td><span class="dept-badge dept-spa">Spa</span></td>
+              <td><span class="amt-mono">350.000 VNĐ</span></td>
+              <td>Lượt</td>
+              <td>
+                <div class="stepper">
+                  <input type="number" value="1" min="1" max="10">
+                </div>
+              </td>
+              <td><span class="amt-mono" style="font-weight: 700;">350.000 VNĐ</span></td>
+              <td><button class="btn-add">Thêm vào hóa đơn</button></td>
+            </tr>
+            <tr>
+              <td><b style="font-family: var(--font-serif); font-size: 14.5px;">Set Bữa sáng Á - Âu cao cấp phục vụ tại phòng</b></td>
+              <td><span class="dept-badge dept-fb">Ẩm thực</span></td>
+              <td><span class="amt-mono">150.000 VNĐ</span></td>
+              <td>Suất</td>
+              <td>
+                <div class="stepper">
+                  <input type="number" value="2" min="1" max="20">
+                </div>
+              </td>
+              <td><span class="amt-mono" style="font-weight: 700;">300.000 VNĐ</span></td>
+              <td><button class="btn-add">Thêm vào hóa đơn</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

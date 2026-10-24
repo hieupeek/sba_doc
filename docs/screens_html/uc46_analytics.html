@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Báo Cáo &amp; Phân Tích Doanh Thu &bull; Grand Horizon</title>
+  <link rel="stylesheet" href="claude_base.css">
+  <style>
+    body {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #ECEAE1;
+      border-right: 1px solid var(--border-soft);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .sidebar-header {
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .brand-crest {
+      width: 34px;
+      height: 34px;
+      background: var(--fg);
+      color: var(--surface);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif);
+      font-size: 19px;
+      font-weight: 600;
+      font-style: italic;
+    }
+    .brand-title {
+      font-family: var(--font-serif);
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--fg);
+      letter-spacing: -0.2px;
+    }
+    .nav-list { list-style: none; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+    .nav-item {
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .nav-item.active {
+      background: var(--surface);
+      color: var(--fg);
+      font-weight: 600;
+      border: 1px solid var(--border-soft);
+    }
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 18px 24px;
+      border-top: 1px solid var(--border-soft);
+      font-size: 11.5px;
+      color: var(--meta);
+    }
+
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .topbar {
+      height: 60px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      flex-shrink: 0;
+    }
+    .topbar-meta { font-size: 12.5px; color: var(--muted); }
+    .topbar-meta b { color: var(--fg); font-weight: 600; }
+    .user-pill { display: flex; align-items: center; gap: 10px; font-size: 12.5px; }
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #E0E7FF;
+      color: #3730A3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 11px;
+      border: 1px solid var(--border-strong);
+    }
+
+    .content-area { padding: 32px; }
+
+    .page-header { margin-bottom: 22px; }
+    .page-title {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .page-desc { font-size: 13px; color: var(--muted); }
+
+    /* Filter Card */
+    .filter-card {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+    }
+    .filter-group { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .filter-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+    }
+    .form-control {
+      height: 38px;
+      padding: 0 12px;
+      background: var(--surface-warm);
+      border: 1.5px solid var(--border-strong);
+      border-radius: 7px;
+      font-size: 13px;
+      color: var(--fg);
+      outline: none;
+      font-family: inherit;
+    }
+    .btn-filter {
+      height: 38px;
+      padding: 0 20px;
+      background: var(--fg);
+      color: var(--surface);
+      border: none;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    .btn-filter .badge { background: var(--surface); color: var(--fg); }
+
+    /* KPI Row */
+    .kpi-section-title {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+    }
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .kpi-label { font-size: 11.5px; color: var(--meta); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-val { font-family: var(--font-serif); font-size: 24px; font-weight: 600; color: var(--fg); margin: 6px 0 4px; }
+    .kpi-sub { font-size: 12px; color: var(--success); font-weight: 500; }
+
+    /* Chart Card */
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 22px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .chart-header h3 {
+      font-family: var(--font-serif);
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+    }
+    .chart-legend { display: flex; gap: 18px; font-size: 12px; color: var(--muted); }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+    .svg-container { width: 100%; height: 210px; overflow: visible; }
+
+    /* Export Row */
+    .action-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .btn-export {
+      height: 42px;
+      padding: 0 20px;
+      background: var(--surface);
+      border: 1.5px solid var(--border-strong);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--fg);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+    .btn-export:hover { background: var(--surface-warm); }
+    .btn-export .badge { background: var(--border-strong); color: var(--fg); }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-crest">H</div>
+      <div class="brand-title">Grand Horizon</div>
+    </div>
+    <ul class="nav-list">
+      <li class="nav-item">Tổng quan</li>
+      <li class="nav-item">Lễ tân &amp; Nhận phòng</li>
+      <li class="nav-item">Quản lý Buồng phòng</li>
+      <li class="nav-item">Bảo trì Cơ sở vật chất</li>
+      <li class="nav-item">Dịch vụ &amp; Tiện ích</li>
+      <li class="nav-item">Thu ngân &amp; Hóa đơn</li>
+      <li class="nav-item active">Báo cáo Doanh thu</li>
+    </ul>
+    <div class="sidebar-footer">
+      Grand Horizon Hotels &amp; Resorts<br>
+      Ban Giám Đốc &bull; Báo cáo Tài chính
+    </div>
+  </aside>
+
+  <main class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-meta">
+        Khách sạn Grand Horizon &bull; <b>Báo cáo &amp; Phân tích Doanh thu</b>
+      </div>
+      <div class="user-pill">
+        <div class="avatar">QM</div>
+        <span>Giám đốc tài chính: <b>Phạm Quang Minh</b> (Ban Giám Đốc)</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <div class="page-header">
+        <h1 class="page-title">Báo Cáo &amp; Phân Tích Doanh Thu Khách Sạn</h1>
+        <p class="page-desc">Tổng hợp chỉ số tài chính, hiệu suất kinh doanh phòng và phân tích xu hướng doanh thu dịch vụ</p>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="filter-card">
+        <div class="filter-group">
+          <label class="filter-label">
+            <span class="badge">1</span>
+            Từ ngày
+          </label>
+          <input type="date" class="form-control" value="2026-10-01">
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">
+            <span class="badge">2</span>
+            Đến ngày
+          </label>
+          <input type="date" class="form-control" value="2026-10-31">
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">
+            <span class="badge">3</span>
+            Nhóm theo tiêu chí
+          </label>
+          <select class="form-control">
+            <option selected>Theo tuần (Tuần 1 - Tuần 4)</option>
+            <option>Theo ngày (31 ngày trong tháng)</option>
+            <option>Theo tháng (Quý 4)</option>
+            <option>Theo phân hạng phòng (Standard, Deluxe, VIP)</option>
+          </select>
+        </div>
+
+        <button class="btn-filter">
+          <span class="badge">4</span>
+          Kết Xuất Báo Cáo
+        </button>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="kpi-section-title">
+        <span class="badge">6</span>
+        Chỉ Số Hiệu Suất Trọng Yếu (KPIs)
+      </div>
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-label">Tổng doanh thu kỳ báo cáo</div>
+          <div class="kpi-val">148.500.000 VNĐ</div>
+          <div class="kpi-sub">&uarr; +14.2% so với tháng trước</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Giá phòng bình quân (ADR)</div>
+          <div class="kpi-val">1.450.000 VNĐ</div>
+          <div class="kpi-sub">&uarr; +4.8% mỗi phòng có khách</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Doanh thu phòng sẵn có (RevPAR)</div>
+          <div class="kpi-val">1.220.000 VNĐ</div>
+          <div class="kpi-sub">&uarr; +8.6% hiệu suất khai thác</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Công suất sử dụng phòng</div>
+          <div class="kpi-val">84.2 %</div>
+          <div class="kpi-sub">Bình quân 40.4 / 48 phòng</div>
+        </div>
+      </div>
+
+      <!-- Chart Card -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>
+            <span class="badge">5</span>
+            Đường Cong Phân Bổ Doanh Thu Trong Kỳ
+          </h3>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <span class="legend-dot" style="background: var(--accent);"></span>
+              <span>Doanh thu phòng nghỉ</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background: var(--success);"></span>
+              <span>Doanh thu dịch vụ (F&amp;B / Spa / Giặt là)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual SVG Chart in Claude Aesthetic -->
+        <svg class="svg-container" viewBox="0 0 800 200">
+          <defs>
+            <linearGradient id="gradRoom" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color: #C96442; stop-opacity: 0.35;" />
+              <stop offset="100%" style="stop-color: #C96442; stop-opacity: 0.02;" />
+            </linearGradient>
+            <linearGradient id="gradService" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color: #166534; stop-opacity: 0.20;" />
+              <stop offset="100%" style="stop-color: #166534; stop-opacity: 0.01;" />
+            </linearGradient>
+          </defs>
+
+          <!-- Grid Lines -->
+          <line x1="40" y1="20" x2="780" y2="20" stroke="#E5E0D5" stroke-dasharray="4" />
+          <line x1="40" y1="65" x2="780" y2="65" stroke="#E5E0D5" stroke-dasharray="4" />
+          <line x1="40" y1="110" x2="780" y2="110" stroke="#E5E0D5" stroke-dasharray="4" />
+          <line x1="40" y1="155" x2="780" y2="155" stroke="#D3CCC0" />
+
+          <!-- Room Tariff Area & Line -->
+          <path d="M 50 130 Q 150 85, 250 100 T 450 50 T 650 70 T 750 35 L 750 155 L 50 155 Z" fill="url(#gradRoom)" />
+          <path d="M 50 130 Q 150 85, 250 100 T 450 50 T 650 70 T 750 35" fill="none" stroke="#C96442" stroke-width="3" />
+
+          <!-- Service Revenue Line -->
+          <path d="M 50 148 Q 150 130, 250 138 T 450 115 T 650 125 T 750 105" fill="none" stroke="#166534" stroke-width="2.5" stroke-dasharray="4" />
+
+          <!-- X-Axis Labels -->
+          <text x="50" y="178" font-size="11" fill="#78736B" font-family="'Plus Jakarta Sans', sans-serif">01/10</text>
+          <text x="190" y="178" font-size="11" fill="#78736B" font-family="'Plus Jakarta Sans', sans-serif">08/10</text>
+          <text x="330" y="178" font-size="11" fill="#78736B" font-family="'Plus Jakarta Sans', sans-serif">15/10</text>
+          <text x="470" y="178" font-size="11" fill="#78736B" font-family="'Plus Jakarta Sans', sans-serif">22/10</text>
+          <text x="610" y="178" font-size="11" fill="#78736B" font-family="'Plus Jakarta Sans', sans-serif">29/10</text>
+          <text x="740" y="178" font-size="11" fill="#78736B" font-family="'Plus Jakarta Sans', sans-serif">31/10</text>
+        </svg>
+      </div>
+
+      <!-- Export Actions -->
+      <div class="action-row">
+        <button class="btn-export">
+          <span class="badge">7</span>
+          Xuất Báo Cáo Định Dạng PDF
+        </button>
+        <button class="btn-export">
+          <span class="badge">8</span>
+          Xuất Bảng Dữ Liệu Excel
+        </button>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

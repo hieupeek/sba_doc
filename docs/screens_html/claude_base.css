@@ -1,0 +1,67 @@
+/* Shared Claude Design System Tokens from open-design/design-systems/claude */
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Surfaces */
+  --bg: #F5F4ED;           /* Warm Parchment canvas */
+  --surface: #FAF9F5;      /* Ivory card surface */
+  --surface-warm: #E8E6DC; /* Warm Sand */
+  --surface-hover: #ECEAE0;
+  
+  /* Foreground text */
+  --fg: #141413;           /* Anthropic Near Black */
+  --fg-2: #3D3D3A;         /* Dark Warm */
+  --muted: #5E5D59;        /* Olive Gray */
+  --meta: #87867F;         /* Stone Gray */
+  
+  /* Borders */
+  --border: #F0EEE6;       /* Border Cream */
+  --border-soft: #E8E6DC;  /* Border Warm */
+  --border-strong: #D5D2C5;
+  
+  /* Accents */
+  --accent: #C96442;       /* Claude Terracotta */
+  --accent-on: #FAF9F5;    /* Ivory text on terracotta */
+  --accent-soft: #F4E8E2;  /* Terracotta wash */
+  --coral: #D97757;
+  --amber: #B45309;
+  
+  /* Status Semantics */
+  --success: #15803D;
+  --success-bg: #EBF7EE;
+  --warning: #B45309;
+  --warning-bg: #FEF3C7;
+  --danger: #B53333;
+  --danger-bg: #FDF0F0;
+  
+  /* Typography */
+  --font-serif: 'Newsreader', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Claude Design Signature Callout Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: var(--accent);
+  color: var(--accent-on);
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  margin-right: 7px;
+  box-shadow: 0 2px 4px rgba(201, 100, 66, 0.35);
+  flex-shrink: 0;
+}

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Xác Nhận Đặt Phòng &bull; Grand Horizon</title>
+  <link rel="stylesheet" href="claude_base.css">
+  <style>
+    body {
+      background: var(--bg);
+      padding: 36px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .checkout-card {
+      width: 1080px;
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(20,20,19,0.04);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .checkout-header {
+      padding: 24px 36px;
+      background: #FAF7F0;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand-wrap { display: flex; align-items: center; gap: 12px; }
+    .brand-crest {
+      width: 32px;
+      height: 32px;
+      background: var(--fg);
+      color: var(--surface);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 600;
+      font-style: italic;
+    }
+    .checkout-header h1 {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--fg);
+    }
+    .steps-pill {
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .step-active {
+      background: var(--surface-warm);
+      color: var(--fg);
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      border: 1px solid var(--border-strong);
+    }
+
+    .checkout-body {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      padding: 36px;
+      gap: 36px;
+    }
+
+    .section-heading {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+    }
+
+    .panel-box {
+      background: #FAF8F2;
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    /* Room Preview */
+    .room-preview-grid {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+    .room-thumb {
+      width: 100px;
+      height: 80px;
+      background: #E8E2D5;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 1px;
+      border: 1px solid var(--border-soft);
+    }
+    .room-info h3 {
+      font-family: var(--font-serif);
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: 4px;
+    }
+    .room-info p {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .amenities-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .amenity-chip {
+      font-size: 11px;
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: var(--meta);
+    }
+
+    /* Form Fields */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .form-group { margin-bottom: 14px; }
+    .form-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: 6px;
+      display: block;
+    }
+    .form-control {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      background: var(--surface);
+      border: 1.5px solid var(--border-strong);
+      border-radius: 7px;
+      font-size: 13.5px;
+      color: var(--fg);
+      outline: none;
+      font-family: inherit;
+    }
+    .form-control:focus { border-color: var(--accent); }
+
+    /* Summary Card */
+    .summary-card {
+      background: #FAF8F2;
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .summary-card h3 {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--fg);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .price-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    .price-table td {
+      padding: 10px 0;
+      font-size: 13px;
+      color: var(--muted);
+      border-bottom: 1px solid #ECE7DD;
+    }
+    .price-table td.amt {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--fg);
+    }
+    .price-table tr.total-row td {
+      padding-top: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--fg);
+      border-bottom: none;
+    }
+    .price-table tr.total-row td.amt {
+      font-size: 18px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .action-panel {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-soft);
+    }
+    .btn-back {
+      height: 44px;
+      padding: 0 20px;
+      background: var(--surface);
+      border: 1.5px solid var(--border-strong);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    .btn-confirm {
+      height: 44px;
+      padding: 0 26px;
+      background: var(--accent);
+      color: var(--accent-on);
+      border: none;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(201, 100, 66, 0.25);
+    }
+    .btn-confirm .badge { background: var(--surface); color: var(--accent); }
+    .btn-back .badge { background: var(--border-strong); color: var(--fg); }
+  </style>
+</head>
+<body>
+  <div class="checkout-card">
+    <div class="checkout-header">
+      <div class="brand-wrap">
+        <div class="brand-crest">H</div>
+        <h1>Grand Horizon &bull; Xác Nhận &amp; Thanh Toán Đặt Phòng</h1>
+      </div>
+      <div class="steps-pill">
+        <span>1. Chọn phòng</span> &bull; 
+        <span class="step-active">2. Thông tin khách hàng</span> &bull; 
+        <span>3. Hoàn tất</span>
+      </div>
+    </div>
+
+    <div class="checkout-body">
+      <div>
+        <!-- 1. Room Category -->
+        <div class="section-heading">
+          <span class="badge">1</span>
+          Hạng phòng đã chọn
+        </div>
+        <div class="panel-box">
+          <div class="room-preview-grid">
+            <div class="room-thumb">DELUXE</div>
+            <div class="room-info">
+              <h3>Phòng Deluxe Đôi Hướng Biển</h3>
+              <p>Tiêu chuẩn: 2 Người lớn &bull; 1 Giường King &bull; Diện tích 32m² &bull; Ban công ngắm biển</p>
+              <div class="amenities-row">
+                <span class="amenity-chip">Wi-Fi miễn phí</span>
+                <span class="amenity-chip">Ban công</span>
+                <span class="amenity-chip">Bồn tắm nằm</span>
+                <span class="amenity-chip">Buffet sáng miễn phí</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Stay Dates -->
+        <div class="section-heading">
+          <span class="badge">2</span>
+          Thời gian lưu trú &amp; Số lượng phòng
+        </div>
+        <div class="panel-box">
+          <div class="form-grid">
+            <div>
+              <label class="form-label">Ngày nhận phòng (Check-in)</label>
+              <input type="date" class="form-control" value="2026-10-25">
+            </div>
+            <div>
+              <label class="form-label">Ngày trả phòng (Check-out)</label>
+              <input type="date" class="form-control" value="2026-10-27">
+            </div>
+          </div>
+          <div style="font-size: 12.5px; color: var(--accent); font-weight: 600;">
+            Thời gian: 2 Đêm &bull; 1 Phòng nghỉ tiêu chuẩn
+          </div>
+        </div>
+
+        <!-- 3. Guest Info -->
+        <div class="section-heading">
+          <span class="badge">3</span>
+          Thông tin người đại diện đặt phòng
+        </div>
+        <div class="panel-box">
+          <div class="form-group">
+            <label class="form-label">Họ và tên khách hàng*</label>
+            <input type="text" class="form-control" value="Phạm Hoàng Long">
+          </div>
+          <div class="form-grid">
+            <div>
+              <label class="form-label">Địa chỉ email*</label>
+              <input type="email" class="form-control" value="hoanglong.pham@gmail.com">
+            </div>
+            <div>
+              <label class="form-label">Số điện thoại liên hệ*</label>
+              <input type="tel" class="form-control" value="0912345678">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Price Card -->
+      <div>
+        <div class="section-heading">
+          <span class="badge">4</span>
+          Chi tiết giá &amp; Khoản thanh toán
+        </div>
+        <div class="summary-card">
+          <h3>Chi Tiết Thanh Toán</h3>
+          <table class="price-table">
+            <tr>
+              <td>Giá phòng Deluxe</td>
+              <td class="amt">1.500.000 VNĐ / đêm</td>
+            </tr>
+            <tr>
+              <td>Thời gian lưu trú</td>
+              <td class="amt">x 2 đêm</td>
+            </tr>
+            <tr>
+              <td>Tổng tiền phòng</td>
+              <td class="amt">3.000.000 VNĐ</td>
+            </tr>
+            <tr>
+              <td>Thuế VAT &amp; Phí dịch vụ</td>
+              <td class="amt">Đã bao gồm</td>
+            </tr>
+            <tr>
+              <td>Giảm giá ưu đãi (Voucher)</td>
+              <td class="amt" style="color: var(--success);">0 VNĐ</td>
+            </tr>
+            <tr class="total-row">
+              <td>Tổng cộng thanh toán</td>
+              <td class="amt">3.000.000 VNĐ</td>
+            </tr>
+          </table>
+
+          <div style="background: var(--surface-warm); padding: 12px; border-radius: 8px; font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.5;">
+            Chính sách đặt phòng: Khoản tiền đặt cọc được xác nhận và đảm bảo phòng ngay khi hoàn tất giao dịch.
+          </div>
+
+          <div class="action-panel">
+            <button class="btn-back">
+              <span class="badge">5</span>
+              Quay lại
+            </button>
+            <button class="btn-confirm">
+              <span class="badge">6</span>
+              Xác Nhận &amp; Đặt Phòng
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
