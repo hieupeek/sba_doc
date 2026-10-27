@@ -223,14 +223,9 @@ Database --> MaintenanceService : Return room details
 deactivate Database
 
 alt Room is vacant (No active stay)
-    MaintenanceService -> Database : Insert into tbl_room_maintenance
+    MaintenanceService -> Database : Save maintenance record & lock room status ('UNDER_MAINTENANCE')
     activate Database
-    Database --> MaintenanceService : Confirm maintenance created
-    deactivate Database
-
-    MaintenanceService -> Database : Update room status = 'UNDER_MAINTENANCE'
-    activate Database
-    Database --> MaintenanceService : Confirm status updated
+    Database --> MaintenanceService : Confirm maintenance scheduled
     deactivate Database
 
     MaintenanceService --> MaintenanceController : returnMaintenanceResponse(dto)
@@ -302,20 +297,15 @@ activate ReservationController
 ReservationController -> ReservationService : processBooking(bookingDTO)
 activate ReservationService
 
-ReservationService -> Database : Check availability quota for dates & room type
+ReservationService -> Database : Check room availability quota for dates & category
 activate Database
-Database --> ReservationService : Return available count
+Database --> ReservationService : Return availability count
 deactivate Database
 
 alt Room quota available for interval
-    ReservationService -> Database : Insert into tbl_reservation
+    ReservationService -> Database : Save reservation transaction (customer, reservation & details)
     activate Database
-    Database --> ReservationService : Return saved reservation
-    deactivate Database
-
-    ReservationService -> Database : Insert into tbl_reservation_detail
-    activate Database
-    Database --> ReservationService : Return saved detail
+    Database --> ReservationService : Confirm reservation saved (bookingRef)
     deactivate Database
 
     ReservationService -> ReservationService : dispatchConfirmationEmail(booking)
@@ -389,30 +379,15 @@ activate FrontDeskController
 FrontDeskController -> FrontDeskService : performCheckIn(checkInDTO)
 activate FrontDeskService
 
-FrontDeskService -> Database : Query reservation by booking code
+FrontDeskService -> Database : Query reservation & available clean rooms
 activate Database
-Database --> FrontDeskService : Return reservation details
+Database --> FrontDeskService : Return reservation details & room list
 deactivate Database
 
 alt Valid booking & Clean room available
-    FrontDeskService -> Database : Query available clean room of category
+    FrontDeskService -> Database : Save check-in transaction (create stay, assignment & set status 'OCCUPIED')
     activate Database
-    Database --> FrontDeskService : Return assigned clean room
-    deactivate Database
-
-    FrontDeskService -> Database : Insert into tbl_guest_stay
-    activate Database
-    Database --> FrontDeskService : Confirm stay record created
-    deactivate Database
-
-    FrontDeskService -> Database : Insert into tbl_stay_room_assignment
-    activate Database
-    Database --> FrontDeskService : Confirm assignment created
-    deactivate Database
-
-    FrontDeskService -> Database : Update room status = 'OCCUPIED'
-    activate Database
-    Database --> FrontDeskService : Confirm room status updated
+    Database --> FrontDeskService : Confirm check-in transaction committed
     deactivate Database
 
     FrontDeskService --> FrontDeskController : returnCheckInResponse(roomKey, stayDetails)
@@ -484,7 +459,7 @@ activate BillingService
 
 BillingService -> Database : Query folio, charges & service orders by stayId
 activate Database
-Database --> BillingService : Return folio details
+Database --> BillingService : Return folio summary
 deactivate Database
 
 BillingService -> BillingService : calculateGrandTotal(charges, services, taxes)
@@ -492,19 +467,9 @@ activate BillingService
 deactivate BillingService
 
 alt Payment authorized & Card approved
-    BillingService -> Database : Insert into tbl_invoice
+    BillingService -> Database : Save payment & close folio transaction (create invoice, payment & mark room 'DIRTY')
     activate Database
-    Database --> BillingService : Confirm invoice created
-    deactivate Database
-
-    BillingService -> Database : Insert into tbl_payment
-    activate Database
-    Database --> BillingService : Confirm payment created
-    deactivate Database
-
-    BillingService -> Database : Update folio status = 'CLOSED'
-    activate Database
-    Database --> BillingService : Confirm folio closed
+    Database --> BillingService : Confirm folio settlement committed
     deactivate Database
 
     BillingService --> BillingController : returnInvoiceReceipt(receiptData)
@@ -575,14 +540,9 @@ ReportController -> ReportService : generateRevenueReport(fromDate, toDate)
 activate ReportService
 
 alt Valid date interval (From Date <= To Date)
-    ReportService -> Database : Query revenue by period (invoices, payments)
+    ReportService -> Database : Query revenue & occupancy datasets for period
     activate Database
-    Database --> ReportService : Return aggregate revenue dataset
-    deactivate Database
-
-    ReportService -> Database : Query occupancy rates by period
-    activate Database
-    Database --> ReportService : Return occupancy counts
+    Database --> ReportService : Return revenue & occupancy summary
     deactivate Database
 
     ReportService -> ReportService : compileSummaryKPIs(totalRev, adr, revPAR, occupancyPct)
