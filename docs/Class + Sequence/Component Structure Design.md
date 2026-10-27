@@ -5,9 +5,9 @@ Tài liệu thiết kế cấu trúc thành phần tầng Backend cho toàn bộ
 - **Inheritance (`--|>`):** Kế thừa lớp cha / repository base.
 - **Realization (`..|>`):** ServiceImpl hiện thực hóa Service interface.
 - **Dependency (`..>`):** Controller sử dụng Service, Repository trả về Entity.
-- **Aggregation (`o--`):** Has-a lỏng lẻo (Service tiêm phụ thuộc Repository, Entity tham chiếu Entity khác; ví dụ `Review o-- Guest_Stay`, `Invoice o-- Voucher`, `Payment o-- Reservation`).
-- **Composition (`*--`):** Has-a chặt chẽ (Reservation sở hữu Reservation_Detail, Guest_Stay sở hữu Stay_Room_Assignment, Folio sở hữu Additional_Charge, Payment sở hữu Payment_Attempt).
-- **Association (`--`):** Liên kết thông thường.
+- **Association (`-->`):** Liên kết có hướng chuẩn mực (Service giữ tham chiếu điều hướng Repository thông qua Dependency Injection; Entity tham chiếu Entity khác thông qua khóa ngoại, ví dụ `User --> Role`, `Room --> Room_Type`, `Review --> Guest_Stay`, `Invoice --> Voucher`, `Payment --> Reservation`).
+- **Composition (`*--`):** Has-a chặt chẽ phụ thuộc vòng đời (Reservation sở hữu Reservation_Detail, Guest_Stay sở hữu Stay_Room_Assignment, Folio sở hữu Additional_Charge, Payment sở hữu Payment_Attempt).
+- **Aggregation (`o--`):** Has-a sở hữu lỏng lẻo toàn thể - bộ phận (Whole-Part độc lập).
 
 ---
 
@@ -48,11 +48,11 @@ JwtAuthenticationFilter ..> AuthenticationService
 UserRepository ..> User
 RoleRepository ..> Role
 
-' 4. Aggregation (o--)
-UserServiceImpl o-- UserRepository
-AuthenticationServiceImpl o-- UserRepository
-AuthenticationServiceImpl o-- RoleRepository
-User o-- Role
+' 4. Association (-->)
+UserServiceImpl --> UserRepository
+AuthenticationServiceImpl --> UserRepository
+AuthenticationServiceImpl --> RoleRepository
+User --> Role
 
 @enduml
 ```
@@ -101,15 +101,15 @@ RoomRepository ..> Room
 RoomTypeRepository ..> Room_Type
 RoomMaintenanceRepository ..> Room_Maintenance
 
-' 4. Aggregation (o--)
-RoomServiceImpl o-- RoomRepository
-RoomServiceImpl o-- RoomTypeRepository
-HousekeepingServiceImpl o-- RoomRepository
-RoomMaintenanceServiceImpl o-- RoomMaintenanceRepository
-RoomMaintenanceServiceImpl o-- RoomRepository
-Room o-- Room_Type
-Room_Maintenance o-- Room
-Room_Maintenance o-- User
+' 4. Association (-->)
+RoomServiceImpl --> RoomRepository
+RoomServiceImpl --> RoomTypeRepository
+HousekeepingServiceImpl --> RoomRepository
+RoomMaintenanceServiceImpl --> RoomMaintenanceRepository
+RoomMaintenanceServiceImpl --> RoomRepository
+Room --> Room_Type
+Room_Maintenance --> Room
+Room_Maintenance --> User
 
 @enduml
 ```
@@ -158,16 +158,16 @@ ReservationDetailRepository ..> Reservation_Detail
 GuestStayRepository ..> Guest_Stay
 StayRoomAssignmentRepository ..> Stay_Room_Assignment
 
-' 4. Aggregation (o--)
-ReservationServiceImpl o-- ReservationRepository
-ReservationServiceImpl o-- ReservationDetailRepository
-FrontDeskServiceImpl o-- GuestStayRepository
-FrontDeskServiceImpl o-- StayRoomAssignmentRepository
-FrontDeskServiceImpl o-- ReservationRepository
-Reservation o-- Customer
-Guest_Stay o-- Reservation
-Reservation_Detail o-- Room_Type
-Stay_Room_Assignment o-- Room
+' 4. Association (-->)
+ReservationServiceImpl --> ReservationRepository
+ReservationServiceImpl --> ReservationDetailRepository
+FrontDeskServiceImpl --> GuestStayRepository
+FrontDeskServiceImpl --> StayRoomAssignmentRepository
+FrontDeskServiceImpl --> ReservationRepository
+Reservation --> Customer
+Guest_Stay --> Reservation
+Reservation_Detail --> Room_Type
+Stay_Room_Assignment --> Room
 
 ' 5. Composition (*--)
 Reservation *-- Reservation_Detail
@@ -242,25 +242,25 @@ PaymentRepository ..> Payment
 PaymentAttemptRepository ..> Payment_Attempt
 VoucherRepository ..> Voucher
 
-' 4. Aggregation (o--)
-HotelServiceServiceImpl o-- HotelServiceRepository
-ServiceOrderServiceImpl o-- ServiceOrderRepository
-ServiceOrderServiceImpl o-- AdditionalChargeRepository
-BillingServiceImpl o-- FolioRepository
-BillingServiceImpl o-- AdditionalChargeRepository
-BillingServiceImpl o-- InvoiceRepository
-BillingServiceImpl o-- VoucherRepository
-PaymentServiceImpl o-- PaymentRepository
-PaymentServiceImpl o-- InvoiceRepository
-PaymentServiceImpl o-- PaymentAttemptRepository
-Service_Order o-- Hotel_Service
-Service_Order o-- Guest_Stay
-Folio o-- Guest_Stay
-Additional_Charge o-- User
-Invoice o-- Folio
-Invoice o-- Voucher
-Payment o-- Invoice
-Payment o-- Reservation
+' 4. Association (-->)
+HotelServiceServiceImpl --> HotelServiceRepository
+ServiceOrderServiceImpl --> ServiceOrderRepository
+ServiceOrderServiceImpl --> AdditionalChargeRepository
+BillingServiceImpl --> FolioRepository
+BillingServiceImpl --> AdditionalChargeRepository
+BillingServiceImpl --> InvoiceRepository
+BillingServiceImpl --> VoucherRepository
+PaymentServiceImpl --> PaymentRepository
+PaymentServiceImpl --> InvoiceRepository
+PaymentServiceImpl --> PaymentAttemptRepository
+Service_Order --> Hotel_Service
+Service_Order --> Guest_Stay
+Folio --> Guest_Stay
+Additional_Charge --> User
+Invoice --> Folio
+Invoice --> Voucher
+Payment --> Invoice
+Payment --> Reservation
 
 ' 5. Composition (*--)
 Folio *-- Additional_Charge
@@ -310,12 +310,12 @@ ReservationRepository ..> Reservation
 RoomRepository ..> Room
 ReportServiceImpl ..> RoomRepository
 
-' 4. Aggregation (o--)
-ReviewServiceImpl o-- ReviewRepository
-ReportServiceImpl o-- ReservationRepository
-ReportServiceImpl o-- RoomRepository
-Review o-- Customer
-Review o-- Guest_Stay
+' 4. Association (-->)
+ReviewServiceImpl --> ReviewRepository
+ReportServiceImpl --> ReservationRepository
+ReportServiceImpl --> RoomRepository
+Review --> Customer
+Review --> Guest_Stay
 
 @enduml
 ```

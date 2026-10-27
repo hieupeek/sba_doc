@@ -1,7 +1,7 @@
 # Sequence Diagram(s) (PlantUML)
 
 Tài liệu thiết kế Sơ đồ tương tác đối tượng (Sequence Diagrams) cho các Use Case cốt lõi thuộc 5 phân hệ của hệ thống HMS.
-Tuân thủ tiêu chuẩn: Đánh số `autonumber 1 "0 : "`, Actor dạng người, tất cả các thành phần hệ thống đều dùng `participant` hình hộp chữ nhật, thể hiện đầy đủ self-call, activation bar và mũi tên nét đứt (`-->`) phản hồi.
+Thiết kế chuẩn phương pháp COMET & Visual Paradigm: Áp dụng đầy đủ stereotype `<<boundary>>` cho các trang giao diện, `<<control>>` cho Controller và Service, và `Database` cho tầng CSDL. Sử dụng phong cách thẩm mỹ Visual Paradigm với màu xanh Cyan #67C8FF, các khung `alt` điều kiện tiếng Anh in đậm màu đen, thể hiện luồng trao đổi thông điệp hoàn chỉnh từ Actor -> Boundary -> Control -> Database.
 
 ---
 
@@ -10,66 +10,85 @@ Tuân thủ tiêu chuẩn: Đánh số `autonumber 1 "0 : "`, Actor dạng ngư�
 ```plantuml
 @startuml
 skinparam shadowed false
-autonumber 1 "0 : "
+autonumber 1 "0: "
+hide footbox
 
-actor "Lifeline2: User" as User
-participant LoginPage
-participant ApiClient
-participant JwtAuthenticationFilter
-participant AuthenticationController
-participant AuthenticationServiceImpl
-participant UserRepository
-participant JwtTokenProvider
+skinparam participantBackgroundColor #67C8FF
+skinparam participantBorderColor #000000
+skinparam participantFontColor #000000
+skinparam participantFontStyle bold
 
-User -> LoginPage : Input username & password, click "Login"
+skinparam databaseBackgroundColor #67C8FF
+skinparam databaseBorderColor #000000
+skinparam databaseFontColor #000000
+
+skinparam sequenceLifeLineBackgroundColor #67C8FF
+skinparam sequenceLifeLineBorderColor #000000
+skinparam sequenceArrowColor #000000
+
+skinparam SequenceGroupFontColor #000000
+skinparam SequenceGroupFontStyle bold
+skinparam SequenceGroupHeaderFontColor #000000
+skinparam SequenceGroupHeaderFontStyle bold
+skinparam SequenceGroupBorderColor #000000
+skinparam SequenceGroupBackgroundColor transparent
+
+actor Staff
+participant LoginPage <<boundary>>
+participant AuthController <<control>>
+participant AuthService <<control>>
+database Database
+
+Staff -> LoginPage : Select option to login & input credentials
 activate LoginPage
 
-LoginPage -> LoginPage : validateLoginForm
-activate LoginPage
-deactivate LoginPage
-
-LoginPage -> ApiClient : post("/api/v1/auth/login", loginDTO)
-activate ApiClient
-
-ApiClient -> JwtAuthenticationFilter : HTTP POST /api/v1/auth/login
-activate JwtAuthenticationFilter
-
-JwtAuthenticationFilter -> AuthenticationController : login(loginDTO)
-deactivate JwtAuthenticationFilter
-activate AuthenticationController
-
-AuthenticationController -> AuthenticationServiceImpl : authenticate(loginDTO)
-activate AuthenticationServiceImpl
-
-AuthenticationServiceImpl -> UserRepository : findByEmail(email)
-activate UserRepository
-UserRepository --> AuthenticationServiceImpl : return User entity
-deactivate UserRepository
-
-AuthenticationServiceImpl -> AuthenticationServiceImpl : verifyPasswordHash(raw, hashed)
-activate AuthenticationServiceImpl
-deactivate AuthenticationServiceImpl
-
-AuthenticationServiceImpl -> JwtTokenProvider : generateToken(user)
-activate JwtTokenProvider
-JwtTokenProvider --> AuthenticationServiceImpl : return jwtAccessToken
-deactivate JwtTokenProvider
-
-AuthenticationServiceImpl --> AuthenticationController : return AuthResponseDTO(token, role)
-deactivate AuthenticationServiceImpl
-
-AuthenticationController --> ApiClient : HTTP 200 OK (JWT, UserProfile)
-deactivate AuthenticationController
-
-ApiClient --> LoginPage : Promise resolved
-deactivate ApiClient
-
-LoginPage -> LoginPage : storeTokenInMemory(token)
+LoginPage -> LoginPage : validateLoginForm()
 activate LoginPage
 deactivate LoginPage
 
-LoginPage --> User : Redirect to Dashboard (by Role)
-deactivate LoginPage
+LoginPage -> AuthController : requestLogin(loginDTO)
+activate AuthController
+
+AuthController -> AuthService : authenticate(loginDTO)
+activate AuthService
+
+AuthService -> Database : Query user by email
+activate Database
+Database --> AuthService : Return user record
+deactivate Database
+
+alt Valid credentials & Active account
+    AuthService -> AuthService : verifyPasswordHash()
+    activate AuthService
+    deactivate AuthService
+
+    AuthService -> AuthService : generateJwtToken(user)
+    activate AuthService
+    deactivate AuthService
+
+    AuthService --> AuthController : returnAuthResponse(token, role)
+    deactivate AuthService
+
+    AuthController --> LoginPage : returnSuccess(token, userProfile)
+    deactivate AuthController
+
+    LoginPage -> LoginPage : storeTokenInMemory(token)
+    activate LoginPage
+    deactivate LoginPage
+
+    LoginPage --> Staff : Redirect to Dashboard (by Role)
+    deactivate LoginPage
+else Invalid credentials or Inactive account
+    activate AuthService
+    AuthService --> AuthController : returnUnauthorizedError()
+    deactivate AuthService
+    activate AuthController
+    AuthController --> LoginPage : returnErrorResponse(401)
+    deactivate AuthController
+    activate LoginPage
+    LoginPage --> Staff : Display error ("Invalid email or password")
+    deactivate LoginPage
+end
 @enduml
 ```
 
@@ -78,128 +97,161 @@ deactivate LoginPage
 ## 2. Mục 4.3: Room & Facility Management
 
 ### 2.1 UC-19 Update Housekeeping Status
+
 ```plantuml
 @startuml
 skinparam shadowed false
-autonumber 1 "0 : "
+autonumber 1 "0: "
+hide footbox
 
-actor "Lifeline2: Housekeeping Staff" as HKStaff
-participant HousekeepingBoardView
-participant ApiClient
-participant JwtAuthenticationFilter
-participant HousekeepingController
-participant HousekeepingServiceImpl
-participant RoomRepository
+skinparam participantBackgroundColor #67C8FF
+skinparam participantBorderColor #000000
+skinparam participantFontColor #000000
+skinparam participantFontStyle bold
 
-HKStaff -> HousekeepingBoardView : Click "Mark Clean" (roomId, remarks)
-activate HousekeepingBoardView
+skinparam databaseBackgroundColor #67C8FF
+skinparam databaseBorderColor #000000
+skinparam databaseFontColor #000000
 
-HousekeepingBoardView -> ApiClient : put("/api/v1/housekeeping/rooms/{id}/cleanliness", dto)
-activate ApiClient
+skinparam sequenceLifeLineBackgroundColor #67C8FF
+skinparam sequenceLifeLineBorderColor #000000
+skinparam sequenceArrowColor #000000
 
-ApiClient -> JwtAuthenticationFilter : HTTP PUT with Bearer Token
-activate JwtAuthenticationFilter
+skinparam SequenceGroupFontColor #000000
+skinparam SequenceGroupFontStyle bold
+skinparam SequenceGroupHeaderFontColor #000000
+skinparam SequenceGroupHeaderFontStyle bold
+skinparam SequenceGroupBorderColor #000000
+skinparam SequenceGroupBackgroundColor transparent
 
-JwtAuthenticationFilter -> JwtAuthenticationFilter : validateJwtToken()
-activate JwtAuthenticationFilter
-deactivate JwtAuthenticationFilter
+actor HousekeepingStaff
+participant HousekeepingBoardPage <<boundary>>
+participant HousekeepingController <<control>>
+participant HousekeepingService <<control>>
+database Database
 
-JwtAuthenticationFilter -> HousekeepingController : updateCleanliness(roomId, dto)
-deactivate JwtAuthenticationFilter
+HousekeepingStaff -> HousekeepingBoardPage : Click "Mark Clean" (roomId, remarks)
+activate HousekeepingBoardPage
+
+HousekeepingBoardPage -> HousekeepingController : updateCleanliness(roomId, statusDTO)
 activate HousekeepingController
 
-HousekeepingController -> HousekeepingServiceImpl : changeRoomCleanliness(roomId, dto)
-activate HousekeepingServiceImpl
+HousekeepingController -> HousekeepingService : changeRoomCleanliness(roomId, statusDTO)
+activate HousekeepingService
 
-HousekeepingServiceImpl -> RoomRepository : findById(roomId)
-activate RoomRepository
-RoomRepository --> HousekeepingServiceImpl : return Room entity
-deactivate RoomRepository
+HousekeepingService -> Database : Query room by id
+activate Database
+Database --> HousekeepingService : Return room record
+deactivate Database
 
-HousekeepingServiceImpl -> HousekeepingServiceImpl : verifyTransitionEligibility()
-activate HousekeepingServiceImpl
-deactivate HousekeepingServiceImpl
+alt Room found & Eligible for transition
+    HousekeepingService -> Database : Update room status = 'CLEAN'
+    activate Database
+    Database --> HousekeepingService : Confirm 1 row updated
+    deactivate Database
 
-HousekeepingServiceImpl -> RoomRepository : save(updatedRoom)
-activate RoomRepository
-RoomRepository --> HousekeepingServiceImpl : return persisted Room
-deactivate RoomRepository
+    HousekeepingService --> HousekeepingController : returnStatusSuccess(roomDTO)
+    deactivate HousekeepingService
 
-HousekeepingServiceImpl --> HousekeepingController : return RoomStatusResponseDTO
-deactivate HousekeepingServiceImpl
+    HousekeepingController --> HousekeepingBoardPage : returnSuccessResponse(200)
+    deactivate HousekeepingController
 
-HousekeepingController --> ApiClient : HTTP 200 OK (JSON)
-deactivate HousekeepingController
-
-ApiClient --> HousekeepingBoardView : Promise resolved
-deactivate ApiClient
-
-HousekeepingBoardView --> HKStaff : Display Success Toast ("Room marked as Clean")
-deactivate HousekeepingBoardView
+    HousekeepingBoardPage --> HousekeepingStaff : Display Success Toast ("Room marked as Clean")
+    deactivate HousekeepingBoardPage
+else Room not found or Invalid state
+    activate HousekeepingService
+    HousekeepingService --> HousekeepingController : returnErrorStatus(404 / 400)
+    deactivate HousekeepingService
+    activate HousekeepingController
+    HousekeepingController --> HousekeepingBoardPage : returnErrorResponse()
+    deactivate HousekeepingController
+    activate HousekeepingBoardPage
+    HousekeepingBoardPage --> HousekeepingStaff : Display Error Toast ("Failed to update status")
+    deactivate HousekeepingBoardPage
+end
 @enduml
 ```
 
+---
+
 ### 2.2 UC-20 Set Room Maintenance
+
 ```plantuml
 @startuml
 skinparam shadowed false
-autonumber 1 "0 : "
+autonumber 1 "0: "
+hide footbox
 
-actor "Lifeline2: Housekeeping Staff" as HKStaff
-participant SetMaintenanceView
-participant ApiClient
-participant JwtAuthenticationFilter
-participant RoomMaintenanceController
-participant RoomMaintenanceServiceImpl
-participant RoomRepository
-participant RoomMaintenanceRepository
+skinparam participantBackgroundColor #67C8FF
+skinparam participantBorderColor #000000
+skinparam participantFontColor #000000
+skinparam participantFontStyle bold
 
-HKStaff -> SetMaintenanceView : Submit Maintenance Form (roomId, defect, date)
-activate SetMaintenanceView
+skinparam databaseBackgroundColor #67C8FF
+skinparam databaseBorderColor #000000
+skinparam databaseFontColor #000000
 
-SetMaintenanceView -> ApiClient : post("/api/v1/maintenance/rooms/{id}", dto)
-activate ApiClient
+skinparam sequenceLifeLineBackgroundColor #67C8FF
+skinparam sequenceLifeLineBorderColor #000000
+skinparam sequenceArrowColor #000000
 
-ApiClient -> JwtAuthenticationFilter : HTTP POST with Bearer Token
-activate JwtAuthenticationFilter
+skinparam SequenceGroupFontColor #000000
+skinparam SequenceGroupFontStyle bold
+skinparam SequenceGroupHeaderFontColor #000000
+skinparam SequenceGroupHeaderFontStyle bold
+skinparam SequenceGroupBorderColor #000000
+skinparam SequenceGroupBackgroundColor transparent
 
-JwtAuthenticationFilter -> RoomMaintenanceController : createMaintenance(roomId, dto)
-deactivate JwtAuthenticationFilter
-activate RoomMaintenanceController
+actor HousekeepingStaff
+participant SetMaintenancePage <<boundary>>
+participant MaintenanceController <<control>>
+participant MaintenanceService <<control>>
+database Database
 
-RoomMaintenanceController -> RoomMaintenanceServiceImpl : scheduleMaintenance(roomId, dto)
-activate RoomMaintenanceServiceImpl
+HousekeepingStaff -> SetMaintenancePage : Submit Maintenance Form (roomId, defect, date)
+activate SetMaintenancePage
 
-RoomMaintenanceServiceImpl -> RoomRepository : findById(roomId)
-activate RoomRepository
-RoomRepository --> RoomMaintenanceServiceImpl : return Room entity
-deactivate RoomRepository
+SetMaintenancePage -> MaintenanceController : createMaintenance(roomId, maintenanceDTO)
+activate MaintenanceController
 
-RoomMaintenanceServiceImpl -> RoomMaintenanceServiceImpl : checkOccupancyStatus(room)
-activate RoomMaintenanceServiceImpl
-deactivate RoomMaintenanceServiceImpl
+MaintenanceController -> MaintenanceService : scheduleMaintenance(roomId, maintenanceDTO)
+activate MaintenanceService
 
-RoomMaintenanceServiceImpl -> RoomMaintenanceRepository : save(new RoomMaintenance)
-activate RoomMaintenanceRepository
-RoomMaintenanceRepository --> RoomMaintenanceServiceImpl : return saved RoomMaintenance
-deactivate RoomMaintenanceRepository
+MaintenanceService -> Database : Query room & occupancy status
+activate Database
+Database --> MaintenanceService : Return room details
+deactivate Database
 
-RoomMaintenanceServiceImpl -> RoomRepository : updateRoomStatus(roomId, "UNDER_MAINTENANCE")
-activate RoomRepository
-RoomRepository --> RoomMaintenanceServiceImpl : return updated Room
-deactivate RoomRepository
+alt Room is vacant (No active stay)
+    MaintenanceService -> Database : Insert into tbl_room_maintenance
+    activate Database
+    Database --> MaintenanceService : Confirm maintenance created
+    deactivate Database
 
-RoomMaintenanceServiceImpl --> RoomMaintenanceController : return MaintenanceResponseDTO
-deactivate RoomMaintenanceServiceImpl
+    MaintenanceService -> Database : Update room status = 'UNDER_MAINTENANCE'
+    activate Database
+    Database --> MaintenanceService : Confirm status updated
+    deactivate Database
 
-RoomMaintenanceController --> ApiClient : HTTP 201 Created (JSON)
-deactivate RoomMaintenanceController
+    MaintenanceService --> MaintenanceController : returnMaintenanceResponse(dto)
+    deactivate MaintenanceService
 
-ApiClient --> SetMaintenanceView : Promise resolved
-deactivate ApiClient
+    MaintenanceController --> SetMaintenancePage : returnCreatedSuccess(201)
+    deactivate MaintenanceController
 
-SetMaintenanceView --> HKStaff : Display Success Toast ("Room locked for Maintenance")
-deactivate SetMaintenanceView
+    SetMaintenancePage --> HousekeepingStaff : Display Success Toast ("Room locked for Maintenance")
+    deactivate SetMaintenancePage
+else Room is currently occupied
+    activate MaintenanceService
+    MaintenanceService --> MaintenanceController : returnOccupiedConflictError(400)
+    deactivate MaintenanceService
+    activate MaintenanceController
+    MaintenanceController --> SetMaintenancePage : returnErrorResponse(400)
+    deactivate MaintenanceController
+    activate SetMaintenancePage
+    SetMaintenancePage --> HousekeepingStaff : Display Error ("Cannot set maintenance for occupied room")
+    deactivate SetMaintenancePage
+end
 @enduml
 ```
 
@@ -207,135 +259,181 @@ deactivate SetMaintenanceView
 
 ## 3. Mục 4.4: Reservation & Front-Desk Operations
 
-### 3.1 UC-21 & UC-23 Search & Create Room Reservation
+### 3.1 UC-23 Room Reservation
+
 ```plantuml
 @startuml
 skinparam shadowed false
-autonumber 1 "0 : "
+autonumber 1 "0: "
+hide footbox
 
-actor "Lifeline2: Customer" as Customer
-participant BookingCheckoutView
-participant ApiClient
-participant ReservationController
-participant ReservationServiceImpl
-participant ReservationRepository
-participant ReservationDetailRepository
-participant MailNotificationService
+skinparam participantBackgroundColor #67C8FF
+skinparam participantBorderColor #000000
+skinparam participantFontColor #000000
+skinparam participantFontStyle bold
 
-Customer -> BookingCheckoutView : Fill guest info, dates & click "Confirm Booking"
-activate BookingCheckoutView
+skinparam databaseBackgroundColor #67C8FF
+skinparam databaseBorderColor #000000
+skinparam databaseFontColor #000000
 
-BookingCheckoutView -> ApiClient : post("/api/v1/reservations", bookingDTO)
-activate ApiClient
+skinparam sequenceLifeLineBackgroundColor #67C8FF
+skinparam sequenceLifeLineBorderColor #000000
+skinparam sequenceArrowColor #000000
 
-ApiClient -> ReservationController : createReservation(bookingDTO)
+skinparam SequenceGroupFontColor #000000
+skinparam SequenceGroupFontStyle bold
+skinparam SequenceGroupHeaderFontColor #000000
+skinparam SequenceGroupHeaderFontStyle bold
+skinparam SequenceGroupBorderColor #000000
+skinparam SequenceGroupBackgroundColor transparent
+
+actor Customer
+participant BookingPage <<boundary>>
+participant ReservationController <<control>>
+participant ReservationService <<control>>
+database Database
+
+Customer -> BookingPage : Fill guest info, dates & click "Confirm Booking"
+activate BookingPage
+
+BookingPage -> ReservationController : createReservation(bookingDTO)
 activate ReservationController
 
-ReservationController -> ReservationServiceImpl : processBooking(bookingDTO)
-activate ReservationServiceImpl
+ReservationController -> ReservationService : processBooking(bookingDTO)
+activate ReservationService
 
-ReservationServiceImpl -> ReservationServiceImpl : checkAvailabilityQuota(dates, roomTypeId)
-activate ReservationServiceImpl
-deactivate ReservationServiceImpl
+ReservationService -> Database : Check availability quota for dates & room type
+activate Database
+Database --> ReservationService : Return available count
+deactivate Database
 
-ReservationServiceImpl -> ReservationRepository : save(new Reservation)
-activate ReservationRepository
-ReservationRepository --> ReservationServiceImpl : return saved Reservation
-deactivate ReservationRepository
+alt Room quota available for interval
+    ReservationService -> Database : Insert into tbl_reservation
+    activate Database
+    Database --> ReservationService : Return saved reservation
+    deactivate Database
 
-ReservationServiceImpl -> ReservationDetailRepository : save(new ReservationDetail)
-activate ReservationDetailRepository
-ReservationDetailRepository --> ReservationServiceImpl : return saved Detail
-deactivate ReservationDetailRepository
+    ReservationService -> Database : Insert into tbl_reservation_detail
+    activate Database
+    Database --> ReservationService : Return saved detail
+    deactivate Database
 
-ReservationServiceImpl -> MailNotificationService : sendBookingConfirmationEmail(booking)
-activate MailNotificationService
-MailNotificationService --> ReservationServiceImpl : email dispatched
-deactivate MailNotificationService
+    ReservationService -> ReservationService : dispatchConfirmationEmail(booking)
+    activate ReservationService
+    deactivate ReservationService
 
-ReservationServiceImpl --> ReservationController : return ReservationResponseDTO
-deactivate ReservationServiceImpl
+    ReservationService --> ReservationController : returnReservationSuccess(bookingRef)
+    deactivate ReservationService
 
-ReservationController --> ApiClient : HTTP 201 Created (Booking Reference Code)
-deactivate ReservationController
+    ReservationController --> BookingPage : returnCreatedSuccess(201, bookingRef)
+    deactivate ReservationController
 
-ApiClient --> BookingCheckoutView : Promise resolved
-deactivate ApiClient
-
-BookingCheckoutView --> Customer : Display Booking Confirmation ("Booking #HMS-9021 confirmed")
-deactivate BookingCheckoutView
+    BookingPage --> Customer : Display Booking Confirmation ("Booking #HMS-9021 confirmed")
+    deactivate BookingPage
+else Room category fully booked
+    activate ReservationService
+    ReservationService --> ReservationController : returnQuotaExceededError(409)
+    deactivate ReservationService
+    activate ReservationController
+    ReservationController --> BookingPage : returnConflictResponse(409)
+    deactivate ReservationController
+    activate BookingPage
+    BookingPage --> Customer : Display Notification ("Fully booked, please select other dates")
+    deactivate BookingPage
+end
 @enduml
 ```
 
-### 3.2 UC-27 Check-in Guest
+---
+
+### 3.2 UC-27 Guest Check-in
+
 ```plantuml
 @startuml
 skinparam shadowed false
-autonumber 1 "0 : "
+autonumber 1 "0: "
+hide footbox
 
-actor "Lifeline2: Front-Desk Staff" as Staff
-participant CheckInView
-participant ApiClient
-participant JwtAuthenticationFilter
-participant FrontDeskController
-participant FrontDeskServiceImpl
-participant ReservationRepository
-participant RoomRepository
-participant GuestStayRepository
-participant StayRoomAssignmentRepository
+skinparam participantBackgroundColor #67C8FF
+skinparam participantBorderColor #000000
+skinparam participantFontColor #000000
+skinparam participantFontStyle bold
 
-Staff -> CheckInView : Input Booking Code & click "Check-in Guest"
-activate CheckInView
+skinparam databaseBackgroundColor #67C8FF
+skinparam databaseBorderColor #000000
+skinparam databaseFontColor #000000
 
-CheckInView -> ApiClient : post("/api/v1/frontdesk/check-in", checkInDTO)
-activate ApiClient
+skinparam sequenceLifeLineBackgroundColor #67C8FF
+skinparam sequenceLifeLineBorderColor #000000
+skinparam sequenceArrowColor #000000
 
-ApiClient -> JwtAuthenticationFilter : HTTP POST with Bearer Token
-activate JwtAuthenticationFilter
+skinparam SequenceGroupFontColor #000000
+skinparam SequenceGroupFontStyle bold
+skinparam SequenceGroupHeaderFontColor #000000
+skinparam SequenceGroupHeaderFontStyle bold
+skinparam SequenceGroupBorderColor #000000
+skinparam SequenceGroupBackgroundColor transparent
 
-JwtAuthenticationFilter -> FrontDeskController : checkInGuest(checkInDTO)
-deactivate JwtAuthenticationFilter
+actor Receptionist
+participant CheckInPage <<boundary>>
+participant FrontDeskController <<control>>
+participant FrontDeskService <<control>>
+database Database
+
+Receptionist -> CheckInPage : Input Booking Code & click "Check-in Guest"
+activate CheckInPage
+
+CheckInPage -> FrontDeskController : checkInGuest(checkInDTO)
 activate FrontDeskController
 
-FrontDeskController -> FrontDeskServiceImpl : performCheckIn(checkInDTO)
-activate FrontDeskServiceImpl
+FrontDeskController -> FrontDeskService : performCheckIn(checkInDTO)
+activate FrontDeskService
 
-FrontDeskServiceImpl -> ReservationRepository : findByCode(bookingCode)
-activate ReservationRepository
-ReservationRepository --> FrontDeskServiceImpl : return Reservation entity
-deactivate ReservationRepository
+FrontDeskService -> Database : Query reservation by booking code
+activate Database
+Database --> FrontDeskService : Return reservation details
+deactivate Database
 
-FrontDeskServiceImpl -> RoomRepository : findAvailableCleanRoom(roomTypeId)
-activate RoomRepository
-RoomRepository --> FrontDeskServiceImpl : return assigned Room
-deactivate RoomRepository
+alt Valid booking & Clean room available
+    FrontDeskService -> Database : Query available clean room of category
+    activate Database
+    Database --> FrontDeskService : Return assigned clean room
+    deactivate Database
 
-FrontDeskServiceImpl -> GuestStayRepository : save(new GuestStay)
-activate GuestStayRepository
-GuestStayRepository --> FrontDeskServiceImpl : return persisted GuestStay
-deactivate GuestStayRepository
+    FrontDeskService -> Database : Insert into tbl_guest_stay
+    activate Database
+    Database --> FrontDeskService : Confirm stay record created
+    deactivate Database
 
-FrontDeskServiceImpl -> StayRoomAssignmentRepository : save(new Assignment)
-activate StayRoomAssignmentRepository
-StayRoomAssignmentRepository --> FrontDeskServiceImpl : return persisted Assignment
-deactivate StayRoomAssignmentRepository
+    FrontDeskService -> Database : Insert into tbl_stay_room_assignment
+    activate Database
+    Database --> FrontDeskService : Confirm assignment created
+    deactivate Database
 
-FrontDeskServiceImpl -> RoomRepository : updateRoomStatus(roomId, "OCCUPIED")
-activate RoomRepository
-RoomRepository --> FrontDeskServiceImpl : status updated
-deactivate RoomRepository
+    FrontDeskService -> Database : Update room status = 'OCCUPIED'
+    activate Database
+    Database --> FrontDeskService : Confirm room status updated
+    deactivate Database
 
-FrontDeskServiceImpl --> FrontDeskController : return CheckInResponseDTO
-deactivate FrontDeskServiceImpl
+    FrontDeskService --> FrontDeskController : returnCheckInResponse(roomKey, stayDetails)
+    deactivate FrontDeskService
 
-FrontDeskController --> ApiClient : HTTP 200 OK (Room Key & Stay Details)
-deactivate FrontDeskController
+    FrontDeskController --> CheckInPage : returnSuccessResponse(200)
+    deactivate FrontDeskController
 
-ApiClient --> CheckInView : Promise resolved
-deactivate ApiClient
-
-CheckInView --> Staff : Display Check-in Success & Print Key Card
-deactivate CheckInView
+    CheckInPage --> Receptionist : Display Check-in Success & Print RFID Key Card
+    deactivate CheckInPage
+else Booking not found or No clean room ready
+    activate FrontDeskService
+    FrontDeskService --> FrontDeskController : returnCheckInError(400)
+    deactivate FrontDeskService
+    activate FrontDeskController
+    FrontDeskController --> CheckInPage : returnErrorResponse(400)
+    deactivate FrontDeskController
+    activate CheckInPage
+    CheckInPage --> Receptionist : Display Error ("No clean room available for assignment")
+    deactivate CheckInPage
+end
 @enduml
 ```
 
@@ -346,75 +444,88 @@ deactivate CheckInView
 ```plantuml
 @startuml
 skinparam shadowed false
-autonumber 1 "0 : "
+autonumber 1 "0: "
+hide footbox
 
-actor "Lifeline2: Cashier / Front-Desk" as Cashier
-participant BillingView
-participant ApiClient
-participant JwtAuthenticationFilter
-participant BillingController
-participant BillingServiceImpl
-participant FolioRepository
-participant InvoiceRepository
-participant PaymentRepository
-participant PaymentGateway
+skinparam participantBackgroundColor #67C8FF
+skinparam participantBorderColor #000000
+skinparam participantFontColor #000000
+skinparam participantFontStyle bold
 
-Cashier -> BillingView : Click "Settle Payment & Check-out" (stayId, method)
-activate BillingView
+skinparam databaseBackgroundColor #67C8FF
+skinparam databaseBorderColor #000000
+skinparam databaseFontColor #000000
 
-BillingView -> ApiClient : post("/api/v1/billing/checkout", settlementDTO)
-activate ApiClient
+skinparam sequenceLifeLineBackgroundColor #67C8FF
+skinparam sequenceLifeLineBorderColor #000000
+skinparam sequenceArrowColor #000000
 
-ApiClient -> JwtAuthenticationFilter : HTTP POST with Bearer Token
-activate JwtAuthenticationFilter
+skinparam SequenceGroupFontColor #000000
+skinparam SequenceGroupFontStyle bold
+skinparam SequenceGroupHeaderFontColor #000000
+skinparam SequenceGroupHeaderFontStyle bold
+skinparam SequenceGroupBorderColor #000000
+skinparam SequenceGroupBackgroundColor transparent
 
-JwtAuthenticationFilter -> BillingController : processCheckOutPayment(settlementDTO)
-deactivate JwtAuthenticationFilter
+actor Cashier
+participant BillingPage <<boundary>>
+participant BillingController <<control>>
+participant BillingService <<control>>
+database Database
+
+Cashier -> BillingPage : Click "Settle Payment & Check-out" (stayId, method)
+activate BillingPage
+
+BillingPage -> BillingController : processCheckOutPayment(settlementDTO)
 activate BillingController
 
-BillingController -> BillingServiceImpl : settleFolioAndCheckout(settlementDTO)
-activate BillingServiceImpl
+BillingController -> BillingService : settleFolioAndCheckout(settlementDTO)
+activate BillingService
 
-BillingServiceImpl -> FolioRepository : findByStayId(stayId)
-activate FolioRepository
-FolioRepository --> BillingServiceImpl : return Folio with AdditionalCharges & ServiceOrders
-deactivate FolioRepository
+BillingService -> Database : Query folio, charges & service orders by stayId
+activate Database
+Database --> BillingService : Return folio details
+deactivate Database
 
-BillingServiceImpl -> BillingServiceImpl : calculateGrandTotal(roomCharges, services, taxes)
-activate BillingServiceImpl
-deactivate BillingServiceImpl
+BillingService -> BillingService : calculateGrandTotal(charges, services, taxes)
+activate BillingService
+deactivate BillingService
 
-BillingServiceImpl -> PaymentGateway : processElectronicCharge(amount, paymentDetails)
-activate PaymentGateway
-PaymentGateway --> BillingServiceImpl : charge authorized (transactionId)
-deactivate PaymentGateway
+alt Payment authorized & Card approved
+    BillingService -> Database : Insert into tbl_invoice
+    activate Database
+    Database --> BillingService : Confirm invoice created
+    deactivate Database
 
-BillingServiceImpl -> InvoiceRepository : save(new Invoice)
-activate InvoiceRepository
-InvoiceRepository --> BillingServiceImpl : return persisted Invoice
-deactivate InvoiceRepository
+    BillingService -> Database : Insert into tbl_payment
+    activate Database
+    Database --> BillingService : Confirm payment created
+    deactivate Database
 
-BillingServiceImpl -> PaymentRepository : save(new Payment)
-activate PaymentRepository
-PaymentRepository --> BillingServiceImpl : return persisted Payment
-deactivate PaymentRepository
+    BillingService -> Database : Update folio status = 'CLOSED'
+    activate Database
+    Database --> BillingService : Confirm folio closed
+    deactivate Database
 
-BillingServiceImpl -> FolioRepository : closeFolio(folioId)
-activate FolioRepository
-FolioRepository --> BillingServiceImpl : folio closed
-deactivate FolioRepository
+    BillingService --> BillingController : returnInvoiceReceipt(receiptData)
+    deactivate BillingService
 
-BillingServiceImpl --> BillingController : return InvoiceReceiptDTO
-deactivate BillingServiceImpl
+    BillingController --> BillingPage : returnSuccessResponse(200)
+    deactivate BillingController
 
-BillingController --> ApiClient : HTTP 200 OK (Receipt Data)
-deactivate BillingController
-
-ApiClient --> BillingView : Promise resolved
-deactivate ApiClient
-
-BillingView --> Cashier : Display Receipt Modal & Trigger Print
-deactivate BillingView
+    BillingPage --> Cashier : Display Receipt Modal & Trigger Print
+    deactivate BillingPage
+else Payment declined or Insufficient funds
+    activate BillingService
+    BillingService --> BillingController : returnPaymentDeclinedError(400)
+    deactivate BillingService
+    activate BillingController
+    BillingController --> BillingPage : returnErrorResponse(400)
+    deactivate BillingController
+    activate BillingPage
+    BillingPage --> Cashier : Display Error ("Payment declined, request alternative method")
+    deactivate BillingPage
+end
 @enduml
 ```
 
@@ -425,61 +536,83 @@ deactivate BillingView
 ```plantuml
 @startuml
 skinparam shadowed false
-autonumber 1 "0 : "
+autonumber 1 "0: "
+hide footbox
 
-actor "Lifeline2: Hotel Manager" as Manager
-participant ReportAnalyticsView
-participant ApiClient
-participant JwtAuthenticationFilter
-participant ReportController
-participant ReportServiceImpl
-participant ReservationRepository
-participant RoomRepository
+skinparam participantBackgroundColor #67C8FF
+skinparam participantBorderColor #000000
+skinparam participantFontColor #000000
+skinparam participantFontStyle bold
 
-Manager -> ReportAnalyticsView : Select Date Range (From - To) & click "Generate Revenue Report"
-activate ReportAnalyticsView
+skinparam databaseBackgroundColor #67C8FF
+skinparam databaseBorderColor #000000
+skinparam databaseFontColor #000000
 
-ReportAnalyticsView -> ApiClient : get("/api/v1/reports/revenue?from=...&to=...")
-activate ApiClient
+skinparam sequenceLifeLineBackgroundColor #67C8FF
+skinparam sequenceLifeLineBorderColor #000000
+skinparam sequenceArrowColor #000000
 
-ApiClient -> JwtAuthenticationFilter : HTTP GET with Bearer Token
-activate JwtAuthenticationFilter
+skinparam SequenceGroupFontColor #000000
+skinparam SequenceGroupFontStyle bold
+skinparam SequenceGroupHeaderFontColor #000000
+skinparam SequenceGroupHeaderFontStyle bold
+skinparam SequenceGroupBorderColor #000000
+skinparam SequenceGroupBackgroundColor transparent
 
-JwtAuthenticationFilter -> ReportController : getRevenueAnalytics(fromDate, toDate)
-deactivate JwtAuthenticationFilter
+actor Manager
+participant RevenueAnalyticsPage <<boundary>>
+participant ReportController <<control>>
+participant ReportService <<control>>
+database Database
+
+Manager -> RevenueAnalyticsPage : Select Date Range & click "Generate Revenue Report"
+activate RevenueAnalyticsPage
+
+RevenueAnalyticsPage -> ReportController : getRevenueAnalytics(fromDate, toDate)
 activate ReportController
 
-ReportController -> ReportServiceImpl : generateRevenueReport(fromDate, toDate)
-activate ReportServiceImpl
+ReportController -> ReportService : generateRevenueReport(fromDate, toDate)
+activate ReportService
 
-ReportServiceImpl -> ReservationRepository : queryRevenueByPeriod(fromDate, toDate)
-activate ReservationRepository
-ReservationRepository --> ReportServiceImpl : return revenue aggregate dataset
-deactivate ReservationRepository
+alt Valid date interval (From Date <= To Date)
+    ReportService -> Database : Query revenue by period (invoices, payments)
+    activate Database
+    Database --> ReportService : Return aggregate revenue dataset
+    deactivate Database
 
-ReportServiceImpl -> RoomRepository : queryOccupancyRates(fromDate, toDate)
-activate RoomRepository
-RoomRepository --> ReportServiceImpl : return occupancy dataset
-deactivate RoomRepository
+    ReportService -> Database : Query occupancy rates by period
+    activate Database
+    Database --> ReportService : Return occupancy counts
+    deactivate Database
 
-ReportServiceImpl -> ReportServiceImpl : compileSummaryKPIs(totalRev, adr, revPAR, occupancyPct)
-activate ReportServiceImpl
-deactivate ReportServiceImpl
+    ReportService -> ReportService : compileSummaryKPIs(totalRev, adr, revPAR, occupancyPct)
+    activate ReportService
+    deactivate ReportService
 
-ReportServiceImpl --> ReportController : return RevenueReportDTO
-deactivate ReportServiceImpl
+    ReportService --> ReportController : returnRevenueReport(kpiDTO, chartData)
+    deactivate ReportService
 
-ReportController --> ApiClient : HTTP 200 OK (JSON Chart Data & Metrics)
-deactivate ReportController
+    ReportController --> RevenueAnalyticsPage : returnSuccessResponse(200, chartData)
+    deactivate ReportController
 
-ApiClient --> ReportAnalyticsView : Promise resolved
-deactivate ApiClient
+    RevenueAnalyticsPage -> RevenueAnalyticsPage : renderChartsAndKPICards()
+    activate RevenueAnalyticsPage
+    deactivate RevenueAnalyticsPage
 
-ReportAnalyticsView -> ReportAnalyticsView : renderChartsAndKPICards()
-activate ReportAnalyticsView
-deactivate ReportAnalyticsView
-
-ReportAnalyticsView --> Manager : Display Revenue Dashboard & Enable PDF Export
-deactivate ReportAnalyticsView
+    RevenueAnalyticsPage --> Manager : Display Revenue Dashboard & Enable PDF Export
+    deactivate RevenueAnalyticsPage
+else Invalid date range (From Date > To Date)
+    activate ReportService
+    ReportService --> ReportController : returnInvalidDateError(400)
+    deactivate ReportService
+    activate ReportController
+    ReportController --> RevenueAnalyticsPage : returnErrorResponse(400)
+    deactivate ReportController
+    activate RevenueAnalyticsPage
+    RevenueAnalyticsPage --> Manager : Display Error ("From Date must be prior to To Date")
+    deactivate RevenueAnalyticsPage
+end
 @enduml
 ```
+
+---
